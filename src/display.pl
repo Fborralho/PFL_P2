@@ -1,6 +1,11 @@
+:-ensure_loaded('game_state.pl').
+
 % Display the game state.
 
-display_game(Board):-    
+display_game(GameState):- 
+    get_board(GameState, Board),
+    get_currentPlayer(GameState,Player),
+    nl, write(Player), write(' turn to play.'), nl,
     nl, write('  A B C D E F G H'), nl,
     display_rows(Board, 8),             % Extracts the board from gamestate, write the columns and rows as letters 
     nl.                                 % and numbers, respectively.
