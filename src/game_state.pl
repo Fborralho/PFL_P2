@@ -1,7 +1,10 @@
+:- dynamic board/1.
+
 % Initial Game Setup
 
 init_game_state(gameState(Board, CurrentPlayer, CapturedPieces, Config)):-
     initial_board(Board),
+    assert(board(Board)),
     CurrentPlayer = black,
     CapturedPieces = captured_pieces(0, 0),
     Config = [].
@@ -23,6 +26,6 @@ initial_board([
     [empty, empty, empty, empty, empty, empty, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
-    [empty, empty, empty, empty, empty, empty, w, w],
-    [empty, empty, empty, empty, empty, empty, w, w]
+    [w, w, w, w, w, w, w, w],
+    [w, w, w, w, w, w, w, w]
 ]).
