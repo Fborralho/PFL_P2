@@ -40,5 +40,4 @@ display_cell(empty):-
     write('.').      % Display empty Piece
 
 
-extract_board(GameState, GameState).
 
