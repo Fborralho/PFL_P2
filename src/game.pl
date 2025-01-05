@@ -1,9 +1,9 @@
 
 :-ensure_loaded('display.pl').
 :-ensure_loaded('move.pl').
+:-ensure_loaded('menu.pl').
 play_game :-
-    init_game_state(GameState),
-    game_loop(GameState).
+    main_menu.
 
 % Recursive game loop
 
@@ -11,21 +11,27 @@ game_loop(GameState) :-
     display_game(GameState),
     \+ check_win_condition(GameState),  % Continue if no winner
     get_currentPlayer(GameState, Player),
-    format('~w\'s turn. Enter your move (FromRow, FromCol, ToRow, ToCol):~n', [Player]),
-    input_move(GameState, Player, (FromRow, FromCol, ToRow, ToCol)),  % Get valid move
-    move(GameState, (FromRow, FromCol, ToRow, ToCol), NewGameState),  % Execute 
-    game_loop(NewGameState).  
+    format('~w\'s turn. Enter your move (FromRow, FromCol, ToRow, ToCol) or type "stop":~n', [Player]),
+    input_move(GameState, Player, Move),  % Get valid move
+    (Move = stop -> write('Game stopped. Thanks for playing!'),nl;
+     move(GameState, Move, NewGameState),  % Execute 
+    game_loop(NewGameState)).
+
+      
 
 % Ask Player for a move
 
 input_move(GameState, Player, Move) :-
     get_board(GameState, Board),
-    read((FromRow, FromCol, ToRow, ToCol)),
-        (valid_moves(Player, Board, Moves),
+    read(Input),
+    (Input = stop ->
+        Move = stop;
+        (Input = (FromRow, FromCol, ToRow, ToCol),
+        valid_moves(Player, Board, Moves),
         member((FromRow, FromCol, ToRow, ToCol), Moves) ->
             Move = (FromRow, FromCol, ToRow, ToCol);  % If valid continue
             write('Invalid move. Please try again.'), nl,
-            input_move(GameState, Player, Move)).  % if invalid repeats
+            input_move(GameState, Player, Move))).  % if invalid repeats
 
 % Check win condition
 check_win_condition(GameState) :-
