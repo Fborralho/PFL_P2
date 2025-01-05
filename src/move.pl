@@ -1,5 +1,4 @@
 :- ensure_loaded('game_state.pl').
-:-ensure_loaded('display.pl').
 :- use_module(library(lists)).
 
 % valid moves for each player
@@ -30,8 +29,8 @@ valid_capturing_move(Player, FromRow, FromCol, ToRow, ToCol, Board):-
 
 % Check if that piece belongs to the opponent
 
-is_opponent(Black, w).
-is_opponent(White, b).
+is_opponent(black, w).
+is_opponent(white, b).
 
 % Between funcion to iterate through the steps
 between(Low, High, Low) :- Low =< High.
@@ -93,8 +92,8 @@ valid_moves(Player, Board, Moves):-
 
 % Checks if piece belongs to that player.
 
-is_player_piece(Black, b).
-is_player_piece(White, w).
+is_player_piece(black, b).
+is_player_piece(white, w).
 
 is_valid_move(Player, FromRow, FromCol, ToRow, ToCol, Board):-
     (valid_non_capturing_move(Player, FromRow, FromCol, ToRow, ToCol, Board);
@@ -106,10 +105,13 @@ is_valid_move(Player, FromRow, FromCol, ToRow, ToCol, Board):-
 move(GameState, (FromRow, FromCol, ToRow, ToCol), NewGameState) :-
     get_board(GameState, Board),
     get_currentPlayer(GameState, Player),
-    is_valid_move(Player, FromRow, FromCol, ToRow, ToCol, Board),
+    (valid_capturing_move(Player, FromRow, FromCol, ToRow, ToCol, Board)->
+        piece_at(Board,ToRow,ToCol,CapturedPiece),
+        update_captured_pieces(Player, CapturedPiece, GameState, UpdatedCapturedPieces);
+        get_capturedPieces(GameState, UpdatedCapturedPieces)),
     execute_move(Board, FromRow, FromCol, ToRow, ToCol, UpdatedBoard),
     switch_player(Player, NextPlayer),
-    NewGameState = gameState(UpdatedBoard, NextPlayer, _, _).  % Captured pieces and config can be updated later
+    NewGameState = gameState(UpdatedBoard, NextPlayer, UpdatedCapturedPieces, _).  
 
 % Pass turn
 
@@ -135,12 +137,13 @@ replace_nth([H|T], N, X, [H|R]) :-
     N1 is N - 1,
     replace_nth(T, N1, X, R).
 
+update_captured_pieces(Player, CapturedPiece, GameState, UpdatedCapturedPieces):-
+    get_capturedPieces(GameState,captured_pieces(BlackCount, WhiteCount)),
+    (Player = black, CapturedPiece = w ->
+        NewBlackCount is BlackCount + 1,
+        UpdatedCapturedPieces = captured_pieces(NewBlackCount, WhiteCount);
+     Player = white, CapturedPiece = b ->
+        NewWhiteCount is WhiteCount + 1,
+        UpdatedCapturedPieces = captured_pieces(BlackCount, NewWhiteCount);
+     UpdatedCapturedPieces = captured_pieces(BlackCount,WhiteCount)).
 
-
-test_move :-
-    initial_board(Board),
-    GameState = gameState(Board, black, captured_pieces(0, 0), []),
-    display_game(GameState),
-    nl, write('Making a move...'), nl,
-    move(GameState, (1, 1, 3, 3), NewGameState),  % Example move for black
-    display_game(NewGameState).
