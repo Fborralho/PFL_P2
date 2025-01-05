@@ -20,12 +20,12 @@ get_config(gameState(_, _, _, Config), Config).
 
 % Test Display 
 initial_board([
-    [b, empty, empty, empty, empty, empty, empty, empty],
+    [b, b, b, b, b, b, empty, empty],
+    [b, b, b, b, b, b, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
     [empty, empty, empty, empty, empty, empty, empty, empty],
-    [empty, empty, empty, empty, empty, empty, empty, empty],
-    [empty, empty, empty, empty, empty, empty, empty, empty],
-    [empty, empty, empty, empty, empty, empty, empty, w]
+    [empty, empty, w, w, w, w, w, w],
+    [empty, empty, w, w, w, w, w, w]
 ]).

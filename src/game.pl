@@ -2,6 +2,8 @@
 :-ensure_loaded('display.pl').
 :-ensure_loaded('move.pl').
 :-ensure_loaded('menu.pl').
+:-use_module(library(random)).
+
 play_game :-
     main_menu.
 
@@ -11,13 +13,36 @@ game_loop(GameState) :-
     display_game(GameState),
     \+ check_win_condition(GameState),  % Continue if no winner
     get_currentPlayer(GameState, Player),
+    get_board(GameState,Board),
     format('~w\'s turn. Enter your move (FromRow, FromCol, ToRow, ToCol) or type "stop":~n', [Player]),
     input_move(GameState, Player, Move),  % Get valid move
     (Move = stop -> write('Game stopped. Thanks for playing!'),nl;
      move(GameState, Move, NewGameState),  % Execute 
     game_loop(NewGameState)).
 
-      
+
+
+game_loop_vs_computer(GameState, PlayerSide) :-
+    display_game(GameState),
+    \+ check_win_condition(GameState),  % Continue if no winner
+    get_currentPlayer(GameState, CurrentPlayer),
+    get_board(GameState,Board),
+    (CurrentPlayer = PlayerSide ->
+        format('~w\'s turn. Enter your move (FromRow, FromCol, ToRow, ToCol) or type "stop":~n', [PlayerSide]),
+        input_move(GameState, PlayerSide, Move),
+        (Move = stop ->
+            write('Game stopped. Thanks for playing!'), nl;
+            move(GameState, Move, NewGameState),
+            game_loop_vs_computer(NewGameState, PlayerSide));
+        
+        format('Computer (~w) is thinking...~n', [CurrentPlayer]),
+        get_board(GameState, Board),
+        valid_moves(CurrentPlayer, Board, Moves),
+        random_member(ComputerMove, Moves),  % Pick a random valid move
+        move(GameState, ComputerMove, NewGameState),
+        game_loop_vs_computer(NewGameState, PlayerSide)
+    ).
+
 
 % Ask Player for a move
 
@@ -43,5 +68,6 @@ check_win_condition(GameState) :-
         fail).  % Continue the game if theres no winner
 
 
-
-
+update_current_player(GameState, NextPlayer, NewGameState) :-
+    get_board(GameState,Board),
+    NewGameState = game_state(Board, currentPlayer(NextPlayer), CapturedPieces).

@@ -1,5 +1,6 @@
 :- ensure_loaded('game.pl').  
 
+
 % Display the main menu
 main_menu :-
     write('======================'), nl,
@@ -70,10 +71,12 @@ choose_computer_side :-
 % Handle side selection
 handle_computer_side(1) :-
     write('Starting Player (Black) vs Computer (White) mode...'), nl,
-    play_game_vs_computer(black).  % Start the game with player as black
+    init_game_state(GameState),
+    game_loop_vs_computer(GameState, black).  % Start the game with player as black
 handle_computer_side(2) :-
     write('Starting Player (White) vs Computer (Black) mode...'), nl,
-    play_game_vs_computer(white).  % Start the game with player as white
+    init_game_state(GameState),
+    game_loop_vs_computer(GameState, white).  % Start the game with player as white
 handle_computer_side(_) :-
     write('Invalid choice. Please try again.'), nl,
     choose_computer_side.
